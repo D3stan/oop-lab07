@@ -4,7 +4,6 @@ import it.unibo.functional.api.Function;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,7 +54,7 @@ public final class Transformers {
      * @param <O> output elements type
      */
     public static <I, O> List<O> transform(final Iterable<I> base, final Function<I, O> transformer) {
-        Function<I, ? extends Collection<? extends O>> singleTrasformer = new Function<I,Collection<? extends O>>() {
+        Function<I, ? extends Collection<? extends O>> singleTrasformer = new Function<I, Collection<? extends O>>() {
             @Override
             public Collection<? extends O> call(final I input) {
                 return List.of(transformer.call(input));
@@ -92,9 +91,19 @@ public final class Transformers {
      * @param test the {@link Function} to use to test whether the elements should be selected.
      * @return A list containing only the elements that passed the test
      * @param <I> elements type
-     */
+    */
     public static <I> List<I> select(final Iterable<I> base, final Function<I, Boolean> test) {
-        return null;
+        return flattenTransform(base, new Function<I, Collection<I>>() {
+            @Override
+            public Collection<I> call(I input) {
+                if (test.call(input)) {
+                    return List.of(input);
+                } else {
+                    return new ArrayList<>();
+                }
+            }
+            
+        });
     }
 
     /**
