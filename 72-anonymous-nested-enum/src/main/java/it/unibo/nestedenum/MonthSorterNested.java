@@ -10,45 +10,75 @@ import java.util.Objects;
 public final class MonthSorterNested implements MonthSorter {
 
     public enum Month {
-        JANUARY(31, "january"), 
-        FEBRUARY(28, "february"), 
-        MARCH(31, "march"), 
-        APRIL(30, "april"), 
-        MAY(31, "May"), 
-        JUNE(30, "June"),
-        JULY(31, "July"), 
-        AUGUST(31, "August"), 
-        SEPTEMBER(30, "September"), 
-        OCTOBER(31, "October"), 
-        NOVEMBER(30, "November"), 
-        DECEMBER(31, "December");
-
+        JANUARY(31), FEBRUARY(28), MARCH(31), APRIL(30), MAY(31), JUNE(30),
+        JULY(31), AUGUST(31), SEPTEMBER(30), OCTOBER(31), NOVEMBER(30), DECEMBER(31);
 
         private final int days;
-        private final String name;
 
-        private Month(final int days, final String name) {
+        private Month(final int days) {
             this.days = days;
-            this.name = name;
         }
 
         public int getDays() {
             return this.days;
         }
 
-        public Month fromString(String month) {
-            JANUARY.name();
-            return JANUARY;
+        public static Month fromString(String monthName) {
+            Month found = JANUARY;
+            int numMatches = 0;
+            for (Month month : Month.values()) {
+                if (
+                    month.toString().equalsIgnoreCase(monthName) || 
+                    month.toString().regionMatches(true, 0, monthName, 0, monthName.length())
+                ) {
+                    numMatches++;
+                    found = month;
+                }
+            }
+
+            if (numMatches == 1) {
+                return found;
+            } else {
+                throw new IllegalArgumentException("Month not found"); 
+            }
         }
     }
 
     @Override
     public Comparator<String> sortByDays() {
-        return null;
+        return new Comparator<String>() {
+            @Override
+            public int compare(String monthName1, String monthName2) {
+                int daysMonth1 = Month.fromString(monthName1).getDays();
+                int daysMonth2 = Month.fromString(monthName2).getDays();
+
+                if (daysMonth1 > daysMonth2) {
+                    return 1;
+                } else if (daysMonth1 < daysMonth2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
     }
 
     @Override
     public Comparator<String> sortByOrder() {
-        return null;
+        return new Comparator<String>() {
+            @Override
+            public int compare(String monthName1, String monthName2) {
+                int daysMonth1 = Month.fromString(monthName1).ordinal();
+                int daysMonth2 = Month.fromString(monthName2).ordinal();
+
+                if (daysMonth1 >  daysMonth2) {
+                    return 1;
+                } else if (daysMonth1 < daysMonth2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
     }
 }
